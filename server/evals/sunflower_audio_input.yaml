@@ -1,0 +1,21 @@
+name: sunflower_audio_input
+
+# Notevibes Callirrhoe fixture: "Akwaaba. Me din de Callirrhoe."
+# The pause produces two VAD segments. Both must arrive before the reply.
+# This checks the ASR/turn-taking path, not pronunciation or transcript accuracy.
+user:
+  modality: audio
+scenarios:
+  - name: complete_twi_utterance
+    turns:
+      - expect:
+          - event: response
+      - user: "Akwaaba. Me din de Callirrhoe."
+        audio: assets/twi_greeting.wav
+        expect:
+          - event: user_transcription
+            text_matches: ".+"
+          - event: user_transcription
+            text_matches: ".+"
+          - event: response
+            text_excludes: "didn't catch"

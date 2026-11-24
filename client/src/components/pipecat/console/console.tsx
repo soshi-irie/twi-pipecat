@@ -168,7 +168,7 @@ export interface ConsoleProps {
    * Extra header content rendered before the connect button — e.g. your
    * app's theme toggle. Rendered only when provided.
    */
-  headerSlot?: React.ReactNode;
+  headerSlot?: React.ReactNode | ((app: UsePipecatAppReturn) => React.ReactNode);
 
   // -- Region toggles (all default false unless noted) -----------------------
   noUserAudio?: boolean;
@@ -519,7 +519,7 @@ function ConsoleShell({
     >
       <header
         data-slot="console-header"
-        className="flex items-center gap-2 border-b px-3 py-2"
+        className="flex flex-wrap items-center gap-2 border-b px-3 py-2"
       >
         <div className="flex shrink-0 items-center">
           {noLogo ? (
@@ -531,10 +531,12 @@ function ConsoleShell({
         <strong className="hidden min-w-0 truncate text-sm md:block">
           {titleText}
         </strong>
-        <div className="ml-auto flex min-w-0 items-center justify-end gap-1">
+        <div className="ml-auto flex min-w-0 max-w-full flex-wrap items-center justify-end gap-1">
           {/* Slot content may shrink; the console's own controls never do. */}
           {headerSlot && (
-            <div className="flex min-w-0 items-center gap-1">{headerSlot}</div>
+            <div className="flex min-w-0 flex-wrap items-center justify-end gap-1">
+              {typeof headerSlot === "function" ? headerSlot(app) : headerSlot}
+            </div>
           )}
           {!noDTMF && <ConsoleKeypadToggle mode={keypadMode} />}
           {!noInfoPanel && (

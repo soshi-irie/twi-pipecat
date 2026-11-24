@@ -1,0 +1,15 @@
+name: transaction_text
+
+# Provider-neutral function calling check; no speech provider or judge required.
+scenarios:
+  - name: transaction_lookup
+    turns:
+      - expect:
+          - event: response
+      - user: "Use your find_transaction tool to check my transfer of 75 cedis to 0203456789. Tell me its status in English."
+        expect:
+          - event: function_call
+            calls:
+              - name: find_transaction
+          - event: response
+            text_contains: "pending"

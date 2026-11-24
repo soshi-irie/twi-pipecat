@@ -1,0 +1,12 @@
+name: smoke_text
+
+# Deterministic text checks: uses the selected LLM provider, with no judge model.
+scenarios:
+  - name: greeting_and_response
+    turns:
+      - expect:
+          - event: response
+      - user: "In English, tell me whether you can help check my transactions."
+        expect:
+          - event: response
+            text_matches: "(?i)transaction"

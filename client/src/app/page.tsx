@@ -8,11 +8,15 @@ import {
   DEFAULT_TRANSPORT,
   PROJECT_NAME,
   TRANSPORT_FACTORIES,
-  TRANSPORT_PROPS,
+  transportPropsForSpeech,
 } from '@/config';
 import type { TransportType } from '@/config';
+import { DEFAULT_VOICE, type VoiceProfile } from '@/lib/voice-profiles';
+import { DEFAULT_DIALECT, type TwiDialect } from '@/lib/twi-dialects';
 
+import { DialectSelect } from './components/DialectSelect';
 import { TransportSelect } from './components/TransportSelect';
+import { VoiceSelect } from './components/VoiceSelect';
 
 /**
  * The Pipecat UI console: connect flow, transcript, metrics, device and
@@ -21,6 +25,8 @@ import { TransportSelect } from './components/TransportSelect';
  * the README shows the minimal composition.
  */
 export default function Home() {
+  const [voice, setVoice] = useState<VoiceProfile>(DEFAULT_VOICE);
+  const [dialect, setDialect] = useState<TwiDialect>(DEFAULT_DIALECT);
   const [transportType, setTransportType] =
     useState<TransportType>(DEFAULT_TRANSPORT);
 
@@ -31,17 +37,21 @@ export default function Home() {
         key={transportType}
         transportType={transportType}
         transportFactory={TRANSPORT_FACTORIES[transportType]}
-        {...TRANSPORT_PROPS[transportType]}
+        {...transportPropsForSpeech(transportType, voice, dialect)}
         titleText={PROJECT_NAME}
-        headerSlot={
-          AVAILABLE_TRANSPORTS.length > 1 ? (
-            <TransportSelect
-              transportType={transportType}
-              onTransportChange={setTransportType}
-              availableTransports={AVAILABLE_TRANSPORTS}
-            />
-          ) : undefined
-        }
+        headerSlot={(app) => (
+          <>
+            <VoiceSelect voice={voice} onVoiceChange={setVoice} isConnecting={app.isConnecting} />
+            <DialectSelect dialect={dialect} onDialectChange={setDialect} isConnecting={app.isConnecting} />
+            {AVAILABLE_TRANSPORTS.length > 1 && (
+              <TransportSelect
+                transportType={transportType}
+                onTransportChange={setTransportType}
+                availableTransports={AVAILABLE_TRANSPORTS}
+              />
+            )}
+          </>
+        )}
       />
     </div>
   );

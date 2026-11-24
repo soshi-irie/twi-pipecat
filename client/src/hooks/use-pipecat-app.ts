@@ -44,6 +44,8 @@ export interface UsePipecatAppOptions {
 }
 
 export interface UsePipecatAppReturn {
+  /** Includes bot startup, before the transport starts connecting. */
+  isConnecting: boolean;
   /** Null until the transport module has loaded and the client is built. */
   client: PipecatClient | null;
   /**
@@ -79,6 +81,7 @@ export function usePipecatApp(
   const attemptRef = useRef<object | null>(null);
 
   const [client, setClient] = useState<PipecatClient | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rawStartBotResponse, setRawStartBotResponse] = useState<unknown>(null);
   const [transformedStartBotResponse, setTransformedStartBotResponse] =
@@ -91,6 +94,7 @@ export function usePipecatApp(
     )
       return;
     connectingRef.current = activeClient;
+    setIsConnecting(true);
     const attempt = {};
     attemptRef.current = attempt;
     const isCurrent = () =>
@@ -163,7 +167,10 @@ export function usePipecatApp(
       );
       await activeClient.disconnect().catch(() => {});
     } finally {
-      if (attemptRef.current === attempt) connectingRef.current = null;
+      if (attemptRef.current === attempt) {
+        connectingRef.current = null;
+        setIsConnecting(false);
+      }
     }
   }, []);
 
@@ -235,6 +242,7 @@ export function usePipecatApp(
       // Cleanup cannot report to an unmounted caller, but must handle rejection.
       void createdClient?.disconnect().catch(() => {});
       setClient(null);
+      setIsConnecting(false);
       setError(null);
       setRawStartBotResponse(null);
       setTransformedStartBotResponse(null);
@@ -251,6 +259,7 @@ export function usePipecatApp(
     if (!client) return;
     attemptRef.current = null;
     connectingRef.current = null;
+    setIsConnecting(false);
     try {
       await client.disconnect();
     } catch (err) {
@@ -266,6 +275,7 @@ export function usePipecatApp(
   }, []);
 
   return {
+    isConnecting,
     client,
     connect,
     disconnect,

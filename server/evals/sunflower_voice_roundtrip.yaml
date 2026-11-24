@@ -1,0 +1,31 @@
+name: sunflower_voice_roundtrip
+
+# Twi speech input and English speech output. A small CPU model transcribes the
+# reply so the test harness does not compete with Sunflower for the Apple GPU.
+# This checks transport/audio generation, not native-speaker pronunciation quality.
+user:
+  modality: audio
+judge:
+  modality: audio
+  transcription:
+    service: whisper
+    model: base
+    language: en
+context:
+  - role: developer
+    content: "For this test, greet briefly in English and answer in one short English sentence."
+scenarios:
+  - name: spoken_reply_to_twi_input
+    turns:
+      - expect:
+          - event: response
+            text_matches: ".+"
+      - user: "Akwaaba. Me din de Callirrhoe."
+        audio: assets/twi_greeting.wav
+        expect:
+          - event: user_transcription
+            text_matches: ".+"
+          - event: user_transcription
+            text_matches: ".+"
+          - event: response
+            text_matches: ".+"

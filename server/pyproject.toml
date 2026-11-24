@@ -5,9 +5,11 @@ description = "Voice AI bot built with Pipecat"
 # onnxruntime, a pipecat-ai dependency, has no Python 3.15 wheels yet.
 requires-python = ">=3.11,<3.15"
 dependencies = [
+    "av>=16,<20",
+    "httpx>=0.28,<1",
     "mlx-whisper>=0.4.3",
     "numpy>=2.4.6",
-    "pipecat-ai[cartesia,daily,deepgram,openai,runner,silero,webrtc,whisper]>=1.12.0",
+    "pipecat-ai[cartesia,daily,deepgram,evals,google,openai,runner,silero,webrtc,whisper]>=1.12.0",
     "pipecatcloud",
     "transformers>=5.24.0",
 ]
